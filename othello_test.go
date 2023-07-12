@@ -18,7 +18,7 @@ func TestPutToken01(t *testing.T) {
 	}
 	b.put(1, 1, 1)
 	b.print()
-	// if b.get(1, 1) != "o" {
-	// 	t.Errorf("Mistake")
-	// }
+	if b.get(1, 1) != "o" {
+		t.Errorf("Mistake")
+	}
 }
