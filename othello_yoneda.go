@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"othello_reverse.go"
 )
 
 type Board struct {
@@ -45,7 +44,6 @@ func (b *Board) erasetriangle() {
 }
 
 func (b *Board) prediction(u int) {
-	ret := false
 	if b.size == 8 {
 		for y := 0; y < 8; y++ {
 			for x := 0; x < 8; x++ {
@@ -114,15 +112,18 @@ func (b *Board) print() {
 
 func (b *Board) scanput() {
 	var x, y int
-	var s int
-
 	if b.player == -1 {
-		fmt.println("The turn of player ●\n")
+		fmt.Printf("The turn of player ●\n")
 	} else {
-		fmt.print("The turn of player ○\n")
+		fmt.Printf("The turn of player ○\n")
 	}
 
 	fmt.Scanf("%d %d %d", &x, &y, &b.player)
+	if b.size == 4 {
+		b.reverse(x+2, y+2, b.player, false)
+	} else if b.size == 8 {
+		b.reverse(x, y, b.player, false)
+	}
 
 }
 
@@ -173,22 +174,211 @@ func (b *Board) checkPlaceable(u int) bool {
 	if b.size == 8 {
 		for y := 0; y < 8; y++ {
 			for x := 0; x < 8; x++ {
-				ret |= b.reverse(x, y, u, true)
+				ret = ret || b.reverse(x, y, u, true)
 			}
 		}
 	} else if b.size == 6 {
 		for y := 1; y < 7; y++ {
 			for x := 1; x < 7; x++ {
-				ret |= b.reverse(x, y, u, true)
+				ret = ret || b.reverse(x, y, u, true)
 			}
 		}
 	} else if b.size == 4 {
 		for y := 2; y < 6; y++ {
 			for x := 2; x < 6; x++ {
-				ret |= b.reverse(x, y, u, true)
+				ret = ret || b.reverse(x, y, u, true)
 			}
 		}
 	}
+	return ret
+}
+
+func (b *Board) reverse(x, y, u int, check bool) bool {
+	if b.get(x, y) != "-" {
+		return false
+	}
+
+	var my, enemy string
+	if u == 1 {
+		my = "o"
+		enemy = "●"
+	} else {
+		my = "●"
+		enemy = "o"
+	}
+
+	var ret = false
+
+	//x+
+	if b.get(x+1, y) == enemy {
+		var p int
+		for p = 1; b.inbound(x+p, y); p++ {
+			if b.get(x+p, y) == enemy {
+				continue
+			} else if b.get(x+p, y) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x+p, y) && b.get(x+p, y) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x+p, y, u)
+				}
+			}
+		}
+	}
+	//x-
+	if b.get(x-1, y) == enemy {
+		var p int
+		for p = 1; b.inbound(x-p, y); p++ {
+			if b.get(x-p, y) == enemy {
+				continue
+			} else if b.get(x-p, y) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x-p, y) && b.get(x-p, y) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x-p, y, u)
+				}
+			}
+		}
+	}
+	//y+
+	if b.get(x, y+1) == enemy {
+		var p int
+		for p = 1; b.inbound(x, y+p); p++ {
+			if b.get(x, y+p) == enemy {
+				continue
+			} else if b.get(x, y+p) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x, y+p) && b.get(x, y+p) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x, y+p, u)
+				}
+			}
+		}
+	}
+	//y-
+	if b.get(x, y-1) == enemy {
+		var p int
+		for p = 1; b.inbound(x, y-p); p++ {
+			if b.get(x, y-p) == enemy {
+				continue
+			} else if b.get(x, y-p) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x, y-p) && b.get(x, y-p) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x, y-p, u)
+				}
+			}
+		}
+	}
+
+	//x+ y+
+	if b.get(x+1, y+1) == enemy {
+		var p int
+		for p = 1; b.inbound(x+p, y+p); p++ {
+			if b.get(x+p, y+p) == enemy {
+				continue
+			} else if b.get(x+p, y+p) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x+p, y+p) && b.get(x+p, y+p) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x+p, y+p, u)
+				}
+			}
+		}
+	}
+	//x- y-
+	if b.get(x-1, y-1) == enemy {
+		var p int
+		for p = 1; b.inbound(x-p, y-p); p++ {
+			if b.get(x-p, y-p) == enemy {
+				continue
+			} else if b.get(x-p, y-p) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x-p, y-p) && b.get(x-p, y-p) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x-p, y-p, u)
+				}
+			}
+		}
+	}
+	//x+ y-
+	if b.get(x+1, y-1) == enemy {
+		var p int
+		for p = 1; b.inbound(x+p, y-p); p++ {
+			if b.get(x+p, y-p) == enemy {
+				continue
+			} else if b.get(x+p, y-p) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x+p, y-p) && b.get(x+p, y-p) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x+p, y-p, u)
+				}
+			}
+		}
+	}
+	//x- y+
+	if b.get(x-1, y+1) == enemy {
+		var p int
+		for p = 1; b.inbound(x-p, y+p); p++ {
+			if b.get(x-p, y+p) == enemy {
+				continue
+			} else if b.get(x-p, y+p) == "-" {
+				break
+			} else {
+				break
+			}
+		}
+		if b.inbound(x-p, y+p) && b.get(x-p, y+p) == my {
+			ret = true
+			if !check {
+				for ; p >= 0; p-- {
+					b.put(x-p, y+p, u)
+				}
+			}
+		}
+	}
+
 	return ret
 }
 
@@ -236,11 +426,12 @@ func main() {
 	for b.checkWinner() == 0 {
 		b.prediction(b.player)
 		b.print()
+		b.erasetriangle()
 		b.scanput()
 		if b.size == 4 && b.checkfull() {
 			b.size = 8
 		}
 		b.switchPlayer()
-		b.erasetriangle()
+
 	}
 }
