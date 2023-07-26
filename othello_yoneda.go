@@ -210,7 +210,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 	var ret = false
 
 	//x+
-	if b.get(x+1, y) == enemy {
+	if b.inbound(x+1, y) && b.get(x+1, y) == enemy {
 		var p int
 		for p = 1; b.inbound(x+p, y); p++ {
 			if b.get(x+p, y) == enemy {
@@ -231,7 +231,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 		}
 	}
 	//x-
-	if b.get(x-1, y) == enemy {
+	if b.inbound(x-1, y) && b.get(x-1, y) == enemy {
 		var p int
 		for p = 1; b.inbound(x-p, y); p++ {
 			if b.get(x-p, y) == enemy {
@@ -252,7 +252,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 		}
 	}
 	//y+
-	if b.get(x, y+1) == enemy {
+	if b.inbound(x, y+1) && b.get(x, y+1) == enemy {
 		var p int
 		for p = 1; b.inbound(x, y+p); p++ {
 			if b.get(x, y+p) == enemy {
@@ -273,7 +273,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 		}
 	}
 	//y-
-	if b.get(x, y-1) == enemy {
+	if b.inbound(x, y-1) && b.get(x, y-1) == enemy {
 		var p int
 		for p = 1; b.inbound(x, y-p); p++ {
 			if b.get(x, y-p) == enemy {
@@ -295,7 +295,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 	}
 
 	//x+ y+
-	if b.get(x+1, y+1) == enemy {
+	if b.inbound(x+1, y+1) && b.get(x+1, y+1) == enemy {
 		var p int
 		for p = 1; b.inbound(x+p, y+p); p++ {
 			if b.get(x+p, y+p) == enemy {
@@ -316,7 +316,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 		}
 	}
 	//x- y-
-	if b.get(x-1, y-1) == enemy {
+	if b.inbound(x-1, y-1) && b.get(x-1, y-1) == enemy {
 		var p int
 		for p = 1; b.inbound(x-p, y-p); p++ {
 			if b.get(x-p, y-p) == enemy {
@@ -337,7 +337,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 		}
 	}
 	//x+ y-
-	if b.get(x+1, y-1) == enemy {
+	if b.inbound(x+1, y-1) && b.get(x+1, y-1) == enemy {
 		var p int
 		for p = 1; b.inbound(x+p, y-p); p++ {
 			if b.get(x+p, y-p) == enemy {
@@ -358,7 +358,7 @@ func (b *Board) reverse(x, y, u int, check bool) bool {
 		}
 	}
 	//x- y+
-	if b.get(x-1, y+1) == enemy {
+	if b.inbound(x-1, y+1) && b.get(x-1, y+1) == enemy {
 		var p int
 		for p = 1; b.inbound(x-p, y+p); p++ {
 			if b.get(x-p, y+p) == enemy {
@@ -427,11 +427,25 @@ func main() {
 		b.prediction(b.player)
 		b.print()
 		b.erasetriangle()
-		b.scanput()
-		if b.size == 4 && b.checkfull() {
-			b.size = 8
+		if b.checkPlaceable(b.player) {
+			b.scanput()
+		}
+		if b.size == 4 {
+			if b.checkfull() {
+				b.size = 8
+			}
+			if !b.checkPlaceable(-1) && !b.checkPlaceable(1) {
+				b.size = 8
+			}
 		}
 		b.switchPlayer()
+	}
 
+	if b.checkWinner() == -1 {
+		fmt.Printf("Player ● win!\n")
+	} else if b.checkWinner() == 1 {
+		fmt.Printf("Player ○ win!\n")
+	} else {
+		fmt.Printf("Draw game!\n")
 	}
 }
