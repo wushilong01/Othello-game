@@ -207,10 +207,13 @@ func (b *Board) checkWinner() int {
 		}
 	}
 	if count1 > count2 {
+		fmt.println("player ○ win!")
 		return 1
 	} else if count1 < count2 {
+		fmt.println("player ● win!")
 		return -1
 	} else if !b.checkPlaceable(-1) && !b.checkPlaceable(1) {
+		fmt.println("Draw!")
 		return 2
 	}
 	return 0
